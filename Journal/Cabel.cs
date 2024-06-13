@@ -19,10 +19,10 @@ namespace Journal
 
         public Cabel(string mark, string number, string typeOfC, string numOfPol, string directionFrom, string dwgFile)
         {
-            this.mark = mark.Contains(' ') ? mark.Remove(' ') : mark;
-            this.number = number.Contains(' ') ? number.Remove(' ') : number;
-            this.typeOfC = typeOfC.Contains(' ') ? typeOfC.Remove(' ') : typeOfC;
-            this.numOfPol = numOfPol.Contains(' ') ? numOfPol.Remove(' ') : numOfPol;
+            this.mark = mark.Trim(' ');
+            this.number = number.Trim(' ');
+            this.typeOfC = typeOfC.Trim(' ');
+            this.numOfPol = numOfPol.Trim(' ');
             directionInfo.Add((directionFrom, dwgFile));
         }
     }

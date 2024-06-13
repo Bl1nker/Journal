@@ -144,14 +144,7 @@ namespace Journal
             foreach (DataGridViewRow row in Table1.SelectedRows)
             {                
                 Table1.Rows.RemoveAt(row.Index);
-                string file = (string) row.Cells[1].Value;
-                string markedFile = "";
-
-                foreach(string str in dwgFiles)
-                {
-                    if(str.Contains(file)) markedFile = str;                    
-                }
-                dwgFiles.Remove(markedFile);
+                dwgFiles = dwgFiles.Where( x => !x.Contains((string)row.Cells[1].Value)).ToList();
                 ShowCabelSources(dwgFiles);
             }
         }
@@ -202,22 +195,15 @@ namespace Journal
 
                     for (int j = 4; j < block.Attributes.Count; j++)
                     {
-                        //Удаление лишних пробелов в конце строки адреса.Кажется не нужно.Строки считываются без пробелов в конце.
-                        //string tmp = block.Attributes[j].Value;
-                        //while (tmp.EndsWith(' '))
-                        //{
-                        //    tmp = tmp[..^2];
-                        //}
-
-                        adr += block.Attributes[j].Value + " ";
+                        adr += block.Attributes[j].Value.Trim(' ') + " ";
                     }
 
                     foreach (Cabel cabel in findedCabels)
                     {
                         if (cabel.mark == block.Attributes[0].Value && cabel.number == block.Attributes[1].Value)
                         {
-                            string type = block.Attributes[2].Value.Contains(' ') ? block.Attributes[2].Value.Remove(' ') : block.Attributes[2].Value;
-                            string pol = block.Attributes[3].Value.Contains(' ') ? block.Attributes[3].Value.Remove(' ') : block.Attributes[3].Value;
+                            string type = block.Attributes[2].Value.Trim(' ');
+                            string pol = block.Attributes[3].Value.Trim(' ');
 
                             if (cabel.typeOfC != type) cabel.errType = true;
                             if (cabel.numOfPol != pol) cabel.errSize = true;
