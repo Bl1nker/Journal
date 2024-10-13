@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Windows.Forms;
 using ACadSharp;
 using ACadSharp.Blocks;
@@ -13,37 +14,37 @@ namespace Journal
     
     public partial class Form1 : Form
     {
-        System.Drawing.Color warningColor = System.Drawing.Color.Pink; // Цвет ошибок в таблице
-        List<string> dwgFiles = new List<string>();
-        List<Cabel> findedCabels = new List<Cabel>();
+        readonly System.Drawing.Color warningColor = System.Drawing.Color.Pink; // Р¦РІРµС‚ РґР»СЏ РІС‹РґРµР»РµР»РµРЅРёСЏ РѕС€РёР±РєРё РІ С‚Р°Р±Р»РёС†Рµ
+        List<string> dwgFiles = new List<string>(); // СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ, РІ РєРѕС‚РѕСЂС‹С… РїСЂРѕРёР·РІРѕРґРёС‚СЃСЏ РїРѕРёСЃРє
+        List<Cabel> findedCabels = new List<Cabel>(); // СЃРїРёСЃРѕРє РЅР°Р№РґРµРЅРЅС‹С… РєР°Р±РµР»РµР№
 
-        bool shortPath = true;
+        bool shortPath = true; // РѕРїСЂРµРґРµР»СЏРµС‚ Р±СѓРґРµС‚ Р»Рё СѓРєР°Р·С‹РІР°С‚СЊСЃСЏ С‚РѕР»СЊРєРѕ РЅР°Р·РІР°РЅРёРµ С„Р°Р№Р»РѕРІ РёР»Рё РїРѕР»РЅС‹Р№ РїСѓС‚СЊ
 
-        ToolStripMenuItem removeFile = new ToolStripMenuItem("Убрать файл");
-        ToolStripMenuItem showFullPath = new ToolStripMenuItem("Показывать полный путь к файлам");
-        ToolStripMenuItem showShortPath = new ToolStripMenuItem("Показывать только названия файлов");
-        ToolStripMenuItem removeAllFiles = new ToolStripMenuItem("Очистить список");
+        ToolStripMenuItem removeFile = new ToolStripMenuItem("РЈР±СЂР°С‚СЊ С„Р°Р№Р»");
+        ToolStripMenuItem showFullPath = new ToolStripMenuItem("РџРѕРєР°Р·С‹РІР°С‚СЊ РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє С„Р°Р№Р»Р°Рј");
+        ToolStripMenuItem showShortPath = new ToolStripMenuItem("РџРѕРєР°Р·С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅР°Р·РІР°РЅРёСЏ С„Р°Р№Р»РѕРІ");
+        ToolStripMenuItem removeAllFiles = new ToolStripMenuItem("РћС‡РёСЃС‚РёС‚СЊ СЃРїРёСЃРѕРє");
 
         public Form1()
         {
             InitializeComponent();
-
+            
             showFullPath.Click += ShowFullPath_Click;
             showShortPath.Click += ShowShortPath_Click;
             removeFile.Click += RemoveFile_Click;
             removeAllFiles.Click += RemoveAllFiles_Click;
-
         }
         
-        void But_selectFiles_Click(object sender, EventArgs e)
+        void But_selectFiles_Click(object sender, EventArgs e) // РІС‹Р±РѕСЂ С„Р°Р№Р»РѕРІ РґР»СЏ РїРѕРёСЃРєР° РєР°Р±РµР»РµР№
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Чертежи AutoCAD (*.dwg)|*.dwg";
+            openFileDialog.Filter = "Р§РµСЂС‚РµР¶Рё AutoCAD (*.dwg)|*.dwg";
             openFileDialog.Multiselect = true;
 
             if (openFileDialog.ShowDialog() == DialogResult.Cancel) return;
-            // получаем выбранный файл
-            
+
+            // Р·Р°РїРёСЃСЊ РІСЃРµС… РІС‹Р±СЂР°РЅРЅС‹С… С„Р°Р№Р»РѕРІ РІ СЃРїРёСЃРѕРє
+
             string[] fileName = openFileDialog.FileNames;
             
             foreach (string file in fileName)
@@ -57,13 +58,13 @@ namespace Journal
             ShowCabelSources(dwgFiles);           
         }
 
-        void But_findCabels(object sender, EventArgs e) 
+        void But_findCabels(object sender, EventArgs e) // РџРѕРёСЃРє РєР°Р±РµР»РµР№ РІ С„Р°Р№Р»Р°С…
         {
             findedCabels.Clear();
 
             if(dwgFiles.Count == 0)
             {
-                MessageBox.Show("Не выбраны файлы для поиска.");
+                MessageBox.Show("РќРµ РІС‹Р±СЂР°РЅС‹ С„Р°Р№Р»С‹ РґР»СЏ РїРѕРёСЃРєР°.");
                 return;
             }
 
@@ -90,20 +91,20 @@ namespace Journal
 
             int countOfErr = findedCabels.Where(n => n.errMsg != null).Count();
 
-            string message = $"Поиск завершен.\n\nКабелей найдено: {findedCabels.Count}\n\nКабелей содержащих ошибки: {countOfErr}\n\n";
-            if (unreadedFiles != "") message += $"Не удалось открыть файлы:\n{unreadedFiles}\nУбедитесь, что файлы не заняты другими процессами и не повреждены.";
+            string message = $"РџРѕРёСЃРє Р·Р°РІРµСЂС€РµРЅ.\n\nРљР°Р±РµР»РµР№ РЅР°Р№РґРµРЅРѕ: {findedCabels.Count}\n\nРљР°Р±РµР»РµР№ СЃРѕРґРµСЂР¶Р°С‰РёС… РѕС€РёР±РєРё: {countOfErr}\n\n";
+            if (unreadedFiles != "") message += $"РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р»С‹:\n{unreadedFiles}\nРЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ С„Р°Р№Р»С‹ РЅРµ Р·Р°РЅСЏС‚С‹ РґСЂСѓРіРёРјРё РїСЂРѕС†РµСЃСЃР°РјРё Рё РЅРµ РїРѕРІСЂРµР¶РґРµРЅС‹.";
             
             MessageBox.Show(message);
 
             if(findedCabels.Count > 0) button_ToExcel.Enabled = true;
         }
 
-        void But_ToExcel_Click(object sender, EventArgs e)
+        void But_ToExcel_Click(object sender, EventArgs e) // Р’С‹Р±РѕСЂ С„Р°Р№Р»Р° Excel СЃ РїРѕСЃР»РµРґСѓСЋС‰РµР№ Р·Р°РїРёСЃСЊСЋ РІ РЅРµРіРѕ РєР°Р±РµР»РµР№
         {
             string fileName;
             {
                 OpenFileDialog openFileDialog = new OpenFileDialog();
-                openFileDialog.Filter = "Файлы Excel (*.xlsx)|*.XLSX";
+                openFileDialog.Filter = "Р¤Р°Р№Р»С‹ Excel (*.xlsx)|*.XLSX";
 
                 if (openFileDialog.ShowDialog() == DialogResult.Cancel) return;
                 fileName = openFileDialog.FileName;
@@ -115,12 +116,12 @@ namespace Journal
             }
             catch
             {
-                MessageBox.Show($"Не удалось выполнить запись в файл:\n{fileName}\nУбедитесь, что файл не занят другими процессами и не повреждён.");
+                MessageBox.Show($"РќРµ СѓРґР°Р»РѕСЃСЊ РІС‹РїРѕР»РЅРёС‚СЊ Р·Р°РїРёСЃСЊ РІ С„Р°Р№Р»:\n{fileName}\nРЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ С„Р°Р№Р» РЅРµ Р·Р°РЅСЏС‚ РґСЂСѓРіРёРјРё РїСЂРѕС†РµСЃСЃР°РјРё Рё РЅРµ РїРѕРІСЂРµР¶РґС‘РЅ.");
             }
         }
 
-        // Элементы контекстного меню таблицы с названиями файлов
-        void ShowFullPath_Click(object? sender, EventArgs e)
+        // Р­Р»РµРјРµРЅС‚С‹ РєРѕРЅС‚РµРєСЃС‚РЅРѕРіРѕ РјРµРЅСЋ С‚Р°Р±Р»РёС†С‹ СЃ РЅР°Р·РІР°РЅРёСЏРјРё С„Р°Р№Р»РѕРІ
+        void ShowFullPath_Click(object? sender, EventArgs e) // РЅР°Р¶Р°С‚РёРµ РЅР° "РџРѕРєР°Р·С‹РІР°С‚СЊ РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє С„Р°Р№Р»Р°Рј"
         {
             shortPath = false;
 
@@ -130,7 +131,7 @@ namespace Journal
             contextForTable1.Items.Add(showShortPath);            
 
         }
-        void ShowShortPath_Click(object? sender, EventArgs e)
+        void ShowShortPath_Click(object? sender, EventArgs e) // РЅР°Р¶Р°С‚РёРµ РЅР° "РџРѕРєР°Р·С‹РІР°С‚СЊ С‚РѕР»СЊРєРѕ РЅР°Р·РІР°РЅРёРµ С„Р°Р№Р»РѕРІ"
         {
             shortPath = true;
 
@@ -139,7 +140,7 @@ namespace Journal
             contextForTable1.Items.Remove(showShortPath);
             contextForTable1.Items.Add(showFullPath);            
         }
-        void RemoveFile_Click(object? sender, EventArgs e)
+        void RemoveFile_Click(object? sender, EventArgs e) // РЅР°Р¶Р°С‚РёРµ РЅР° "РЈР±СЂР°С‚СЊ С„Р°Р№Р»"
         {
             foreach (DataGridViewRow row in Table1.SelectedRows)
             {                
@@ -148,7 +149,7 @@ namespace Journal
                 ShowCabelSources(dwgFiles);
             }
         }
-        void RemoveAllFiles_Click(object? sender, EventArgs e)
+        void RemoveAllFiles_Click(object? sender, EventArgs e) // РЅР°Р¶Р°С‚РёРµ РЅР° "РћС‡РёСЃС‚РёС‚СЊ СЃРїРёСЃРѕРє"
         {
             Table1.Rows.Clear();
             dwgFiles.Clear();
@@ -160,7 +161,7 @@ namespace Journal
         }
         //-----------------------------------------------------
 
-        void FindCabel(string file, out bool unreadable) // Поиск кабелей в файле
+        void FindCabel(string file, out bool unreadable) // РџРѕРёСЃРє РєР°Р±РµР»РµР№ РІ РїРѕР»СѓС‡РµРЅРЅРѕРј С„Р°Р№Р»Рµ. Р’РѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РїСЂРё С‡С‚РµРЅРёРё С„Р°Р№Р»Р° РІРѕР·РЅРёРєР»Р° РѕС€РёР±РєР°
         {
             CadDocument doc;
             
@@ -183,12 +184,12 @@ namespace Journal
                                    where blc is Insert
                                    select blc as Insert
                                      into kbl
-                                   where kbl.HasAttributes && kbl.Attributes[0].Tag == "МАРКА" && kbl.Attributes[1].Tag == "НОМЕР"
+                                   where kbl.HasAttributes && kbl.Attributes[0].Tag == "РњРђР РљРђ" && kbl.Attributes[1].Tag == "РќРћРњР•Р "
                                    select kbl;
                                 
                 foreach (Insert block in listOfBlocks)
                 {
-                    // Аттрибуты: 0 - марка; 1 - номер; 2 - тип; 3 - число жил и сечение; 4 - направление (каждая строка направления кабеля идет отдельным атрибутом)
+                    // РђС‚С‚СЂРёР±СѓС‚С‹: 0 - РјР°СЂРєР°; 1 - РЅРѕРјРµСЂ; 2 - С‚РёРї; 3 - С‡РёСЃР»Рѕ Р¶РёР» Рё СЃРµС‡РµРЅРёРµ; 4 - РЅР°РїСЂР°РІР»РµРЅРёРµ (РєР°Р¶РґР°СЏ СЃС‚СЂРѕРєР° РЅР°РїСЂР°РІР»РµРЅРёСЏ РєР°Р±РµР»СЏ РёРґРµС‚ РѕС‚РґРµР»СЊРЅС‹Рј Р°С‚СЂРёР±СѓС‚РѕРј)
 
                     bool exist = false;
                     string adr = "";
@@ -217,45 +218,46 @@ namespace Journal
             }
         }
 
-        void CheckErr(Cabel cabel) // Составление сообщения об ошибке в кабеле, при ее наличии.
+        void CheckErr(Cabel cabel) // РџСЂРѕРІРµСЂРєР° РєР°Р±РµР»СЏ РЅР° РЅР°Р»РёС‡РёРµ РѕС€РёР±РѕРє Рё РїРѕСЃР»РµРґСѓСЋС‰РµРµ СЃРѕСЃС‚Р°РІР»РµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕР± РѕС€РёР±РєРµ.
         {
-            string err = $"{cabel.mark}-{cabel.number} :\n";
+            StringBuilder err = new StringBuilder();
+            err.Append($"{cabel.mark}-{cabel.number} :\n");
 
             if (cabel.errType)
             {
-                err += "\tНа схемах, указаны два разных типа кабеля.\n";
+                err.Append("\tРќР° СЃС…РµРјР°С…, СѓРєР°Р·Р°РЅС‹ РґРІР° СЂР°Р·РЅС‹С… С‚РёРїР° РєР°Р±РµР»СЏ\n");
             }
 
             if (cabel.errSize)
             {
-                err += "\tНа схемах, указаны разные сечения, или разное количество жил.\n";
+                err.Append("\tРќР° СЃС…РµРјР°С…, СѓРєР°Р·Р°РЅС‹ СЂР°Р·РЅС‹Рµ СЃРµС‡РµРЅРёСЏ, РёР»Рё СЂР°Р·РЅРѕРµ РєРѕР»РёС‡РµСЃС‚РІРѕ Р¶РёР».\n");
             }
 
             if (cabel.directionInfo.Count == 1)
             {
                 if (cabel.directionInfo[0].direction == " ")
                 {
-                    err += $"\tУ кабеля, в файле {cabel.directionInfo[0].file}, не указано ни одного направления";
+                    err.Append($"\tРЈ РєР°Р±РµР»СЏ, РІ С„Р°Р№Р»Рµ {cabel.directionInfo[0].file}, РЅРµ СѓРєР°Р·Р°РЅРѕ РЅРё РѕРґРЅРѕРіРѕ РЅР°РїСЂР°РІР»РµРЅРёСЏ");
                         
                 }
-                else err += $"\tУказано только одно направление кабеля:\n\t\t- {cabel.directionInfo[0].direction} \tв файле: {cabel.directionInfo[0].file}";
-                cabel.errMsg = err;
+                else err.Append($"\tРЈРєР°Р·Р°РЅРѕ С‚РѕР»СЊРєРѕ РѕРґРЅРѕ РЅР°РїСЂР°РІР»РµРЅРёРµ РєР°Р±РµР»СЏ:\n\t\t- {cabel.directionInfo[0].direction} \tРІ С„Р°Р№Р»Рµ: {cabel.directionInfo[0].file}");
+                cabel.errMsg = err.ToString();
 
             }
             else if (cabel.directionInfo.Count == 2 && (cabel.errSize || cabel.errType))
             {
-                err += $"\tУказанные направления кабеля:\n\t\t- {cabel.directionInfo[0].direction} \tв файле: {cabel.directionInfo[0].file}\n\t\t- {cabel.directionInfo[1].direction} \tв файле: {cabel.directionInfo[1].file}";
-                cabel.errMsg = err;
+                err.Append($"\tРЈРєР°Р·Р°РЅРЅС‹Рµ РЅР°РїСЂР°РІР»РµРЅРёСЏ РєР°Р±РµР»СЏ:\n\t\t- {cabel.directionInfo[0].direction} \tРІ С„Р°Р№Р»Рµ: {cabel.directionInfo[0].file}\n\t\t- {cabel.directionInfo[1].direction} \tРІ С„Р°Р№Р»Рµ: {cabel.directionInfo[1].file}");
+                cabel.errMsg = err.ToString();
                     
             }
             else if (cabel.directionInfo.Count > 2)
             {
-                err += $"\tУказано более двух направлений кабеля:\n";
+                err.Append($"\tРЈРєР°Р·Р°РЅРѕ Р±РѕР»РµРµ РґРІСѓС… РЅР°РїСЂР°РІР»РµРЅРёР№ РєР°Р±РµР»СЏ:\n");
                 foreach (var (direction, file) in cabel.directionInfo)
                 {
-                    err += $"\t\t- {direction} \tв файле: {file}\n";
+                    err.Append($"\t\t- {direction} \tРІ С„Р°Р№Р»Рµ: {file}\n");
                 }
-                cabel.errMsg = err;                    
+                cabel.errMsg = err.ToString();                    
             }
         }
 
@@ -265,23 +267,23 @@ namespace Journal
 
             ExcelWorksheet ws = package.Workbook.Worksheets[0]; ;
 
-            if (ws.ToString() == "_ЗАПОЛНЕНИЕ_")
+            if (ws.ToString() == "_Р—РђРџРћР›РќР•РќРР•_")
             {
                 int countLine = 3;
 
                 foreach (var cabel in cabels)
                 {
-                    ws.Cells[$"D{countLine}"].Value = cabel.mark + "-" + cabel.number; // марка + "-" + номер
-                    ws.Cells[$"E{countLine}"].Value = cabel.typeOfC; // тип кабеля
-                    ws.Cells[$"F{countLine}"].Value = cabel.numOfPol; // число жил и сечение кабеля
+                    ws.Cells[$"D{countLine}"].Value = cabel.mark + "-" + cabel.number; // РјР°СЂРєР° + "-" + РЅРѕРјРµСЂ
+                    ws.Cells[$"E{countLine}"].Value = cabel.typeOfC; // С‚РёРї РєР°Р±РµР»СЏ
+                    ws.Cells[$"F{countLine}"].Value = cabel.numOfPol; // С‡РёСЃР»Рѕ Р¶РёР» Рё СЃРµС‡РµРЅРёРµ РєР°Р±РµР»СЏ
 
-                    int cellMaxLength = 45;  //максимальное число символов в ячейке адреса
+                    int cellMaxLength = 45;  //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ С‡РёСЃР»Рѕ СЃРёРјРІРѕР»РѕРІ РІ СЏС‡РµР№РєРµ Р°РґСЂРµСЃР°, РґР»СЏ РїРµСЂРµС…РѕРґР° РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ СЃС‚СЂРѕРєСѓ
                     int count1 = 0;
                     int count2 = 0;
 
-                    // откуда идет кабель
+                    // РѕС‚РєСѓРґР° РёРґРµС‚ РєР°Р±РµР»СЊ
                     string tmpStr = cabel.directionInfo[0].direction;
-                    while (tmpStr.Length > cellMaxLength) // разбиение адреса на строки, если адрес больше ширины ячейки
+                    while (tmpStr.Length > cellMaxLength) // РџРµСЂРµС…РѕРґ РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ РІ РЅР°РїРёСЃР°РЅРёРё Р°РґСЂРµСЃР°, РµСЃР»Рё Р°РґСЂРµСЃ Р±РѕР»СЊС€Рµ С€РёСЂРёРЅС‹ СЏС‡РµР№РєРё
                     {
                         int index = tmpStr[..cellMaxLength].LastIndexOf(' ') >= (cellMaxLength - 4) ? tmpStr[..cellMaxLength].LastIndexOf(' ') + 1 : cellMaxLength;
                         ws.Cells[$"H{countLine + count1}"].Value = tmpStr[..index] + (tmpStr[..index].LastIndexOf(' ') == tmpStr[..index].Length - 1 ? "" : "-");
@@ -290,11 +292,11 @@ namespace Journal
                     }
                     ws.Cells[$"H{countLine + count1}"].Value = tmpStr;
 
-                    // куда идет кабель
+                    // РєСѓРґР° РёРґРµС‚ РєР°Р±РµР»СЊ
                     if (cabel.directionInfo.Count > 1)
                     {
                         tmpStr = cabel.directionInfo[1].direction;
-                        while (tmpStr.Length > cellMaxLength) // разбиение адреса на строки, если адрес больше ширины ячейки
+                        while (tmpStr.Length > cellMaxLength) // РџРµСЂРµС…РѕРґ РЅР° РЅРѕРІСѓСЋ СЃС‚СЂРѕРєСѓ РІ РЅР°РїРёСЃР°РЅРёРё Р°РґСЂРµСЃР°, РµСЃР»Рё Р°РґСЂРµСЃ Р±РѕР»СЊС€Рµ С€РёСЂРёРЅС‹ СЏС‡РµР№РєРё
                         {
                             int index = tmpStr[..cellMaxLength].LastIndexOf(' ') >= (cellMaxLength - 4) ? tmpStr[..cellMaxLength].LastIndexOf(' ') + 1 : cellMaxLength;
                             ws.Cells[$"I{countLine + count2}"].Value = tmpStr[..index] + (tmpStr[..index].LastIndexOf(' ') == tmpStr[..index].Length - 1 ? "" : "-");
@@ -304,17 +306,17 @@ namespace Journal
                         ws.Cells[$"I{countLine + count2}"].Value = tmpStr;
                     }
 
-                    countLine += (count1 >= count2 ? count1 : count2) + 1; //переход на следующую свободную строку в Excel
+                    countLine += (count1 >= count2 ? count1 : count2) + 1; //РїРµСЂРµС…РѕРґ РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ СЃРІРѕР±РѕРґРЅСѓСЋ СЃС‚СЂРѕРєСѓ РІ Excel
                 }
 
                 package.Save();
                 
-                MessageBox.Show($"Кабели успешно записаны в файл {fileExcel}");
+                MessageBox.Show($"РљР°Р±РµР»Рё СѓСЃРїРµС€РЅРѕ Р·Р°РїРёСЃР°РЅС‹ РІ С„Р°Р№Р» {fileExcel}");
             }
-            else MessageBox.Show("В указанном файле Excel, не удалось найти лист \"_ЗАПОЛНЕНИЕ_\".\nЗапись не выполнена."); 
+            else MessageBox.Show("Р’ СѓРєР°Р·Р°РЅРЅРѕРј С„Р°Р№Р»Рµ Excel, РЅРµ СѓРґР°Р»РѕСЃСЊ РЅР°Р№С‚Рё Р»РёСЃС‚ \"_Р—РђРџРћР›РќР•РќРР•_\".\nР—Р°РїРёСЃСЊ РЅРµ РІС‹РїРѕР»РЅРµРЅР°."); 
         }
 
-        void ShowCabelSources(List<string> sourses) // Отображение, в таблице1, файлов dwg выбранных для поиска кабелей
+        void ShowCabelSources(List<string> sourses) // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ, РІ С‚Р°Р±Р»РёС†Рµ1, С„Р°Р№Р»РѕРІ dwg РІС‹Р±СЂР°РЅРЅС‹С… РґР»СЏ РїРѕРёСЃРєР° РєР°Р±РµР»РµР№
         {
             Table1.Rows.Clear();
             
@@ -329,10 +331,12 @@ namespace Journal
                 };
 
                 string name;
-                if(shortPath)
+                // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РїРѕР»РЅРѕРіРѕ РїСѓС‚Рё Рє С„Р°Р№Р»Сѓ РёР»Рё С‚РѕР»СЊРєРѕ РЅР°Р·РІР°РЅРёСЏ С„Р°Р№Р»Р°
+                if (shortPath)
                 {
-                    name = file[(file.LastIndexOf('\\')+1)..];
-                } else { name = file; }
+                    name = file[(file.LastIndexOf('\\') + 1)..];
+                }
+                else { name = file; }
 
                 DataGridViewCell nameOfFile = new DataGridViewTextBoxCell
                 {
@@ -343,8 +347,10 @@ namespace Journal
                 countOfRows++;
             }
 
+            // Р”РѕР±Р°РІР»СЏРµРј, РІ РєРѕРЅС‚РµРєСЃС‚РЅРѕРµ РјРµРЅСЋ, СЃС‚СЂРѕРєСѓ "РџРѕРєР°Р·С‹РІР°С‚СЊ РїРѕР»РЅС‹Р№ РїСѓС‚СЊ Рє С„Р°Р№Р»Сѓ" Р•СЃР»Рё РЅРµ РІС‹Р±СЂР°РЅРѕ РЅРёС‡РµРіРѕ РґСЂСѓРіРѕРіРѕ.
             if (!contextForTable1.Items.Contains(showShortPath) && !contextForTable1.Items.Contains(showFullPath)) contextForTable1.Items.Add(showFullPath);
 
+            // Р”РѕР±Р°РІР»РµРЅРёРµ РёР»Рё СѓРґР°Р»РµРЅРёРµ СЃС‚СЂРѕРє РёР· РєРѕРЅС‚Р°РєСЃС‚РЅРѕРіРѕ РјРµРЅСЋ, РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ РЅР°Р»РёС‡РёСЏ СЌР»РµРјРµРЅС‚РѕРІ РІ С‚Р°Р±Р»РёС†Рµ
             if (Table1.Rows.Count != 0)
             {
                 contextForTable1.Items.Add(removeFile);                
@@ -357,7 +363,7 @@ namespace Journal
             }
         }
                 
-        void ShowCabels() // Отображение найденных кабелей в таблице2 
+        void ShowCabels() // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РЅР°Р№РґРµРЅРЅС‹С… РєР°Р±РµР»РµР№ РІ С‚Р°Р±Р»РёС†Рµ2 
         {
             int count = 1;
             Table2.Rows.Clear();
@@ -433,8 +439,7 @@ namespace Journal
                 count++;
             }
 
-            tabControl1.SelectTab(tabPage2); // Переключение вкладки на таблицу с кабелями
-
+            tabControl1.SelectTab(tabPage2); // РџРµСЂРµРєР»СЋС‡РµРЅРёРµ РІРєР»Р°РґРєРё РЅР° С‚Р°Р±Р»РёС†Сѓ СЃ РєР°Р±РµР»СЏРјРё
         }
     }
 }

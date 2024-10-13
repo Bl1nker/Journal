@@ -152,7 +152,7 @@
             // contextForTable1
             // 
             contextForTable1.Name = "contextMenuStrip1";
-            contextForTable1.Size = new Size(61, 4);
+            contextForTable1.Size = new Size(61, 4);            
             // 
             // tabPage2
             // 
